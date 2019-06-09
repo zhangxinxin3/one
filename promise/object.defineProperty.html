@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+</body>
+<script>
+    /**
+        - writable //是否可写入
+        - enumerable //是否可被枚举
+        - configurable //是否可被删除
+        - value //是否可被
+        - get //
+        - set //修改后
+    */
+
+    var obj = {
+        a:1
+    };
+    Object.defineProperty(obj,'a',{
+        writable:false
+    })
+    
+    // Object.defineProperty(obj,'a',{
+    //     configurable:false
+    // })
+    
+    Object.defineProperty(obj,'a',{
+        enumerable:false
+    })
+
+    Object.defineProperty(obj,'a',{
+        value:false
+    })
+    
+    Object.defineProperty(obj,'a',{
+        get:()=>{
+            return 'abc'
+        },
+        set:(val)=>{
+            console.log('val...',val)//val... 10
+        }
+    })
+</script>
+</html>
