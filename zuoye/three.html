@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+</body>
+<script>
+    // 3. 封装Person能够满足如下测试用例
+        Person('li');
+        // This is li
+        Person('li').sleep(10).eat('danner')
+        // This is li
+        // ...等待10ms
+        // sleep after 10
+        // eat danner
+        Person('li').sleepFirst(5000).eat('danner').sleep(3000).eat('food').sleep(3000).eat(123);
+        // ...等待5s
+        // sleep before 5000
+        // This is li
+        // eat dinner
+        // sleep after 3000
+        // eat food
+        // sleep after 3000
+        // eat 123
+        // ...等待5ms
+        // sleep before 5
+        // This is li
+        // eat danner
+        Person('li').eat('food').eat('danner')
+        // This is li
+        // eat food
+        // eat danner
+
+        function Person(){
+            return new Promise((resolve,reject)=>{
+                img.onload = function(){
+                    resolve(img);
+                }
+                img.onerror = function(e){
+                    reject(e);
+                }
+            })
+        }
+</script>
+</html>

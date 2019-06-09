@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        img{
+            width:200px;
+            height:200px;
+        }
+    </style>
+</head>
+<body>
+</body>
+<script>
+    //并行加载
+    var arr = [
+        "img/1.jpg",
+        "img/2.jpg",
+        "img/3.jpg"
+    ];
+
+    function delay () {
+        return new Promise(resolve => setTimeout(resolve, 500));
+    }
+
+    async function delayedLog(item) {
+        await delay();
+        let img = new Image();
+        img.src=item;
+        console.log(img)
+        document.body.appendChild(img)
+    }
+
+    async function processArray(array) {
+        const promiseArr = array.map(delayedLog);
+        await Promise.all(promiseArr);
+    }
+    
+    processArray(arr);
+
+    // function delay (item) {
+    //     return new Promise(resolve => setTimeout(resolve(item), 800));
+    // }
+
+    // async function create(arr){
+    //     for (const item of arr) {
+    //         let img = new Image();
+    //         let url = await delay(item);
+    //         img.src = url;
+    //         document.body.appendChild(img)
+    //     }
+        
+    // }
+
+    // create(arr).then(res=>{
+    //     console.log(res)
+    // })
+</script>
+</html>
