@@ -1,0 +1,244 @@
+let
+
+有作用域
+
+const
+
+定义常量
+
+defineProperty
+
+writable //是否可写入
+enumerable //是否可被枚举
+configurable //是否可被删除
+value //是否可被
+get //
+set //修改后
+ES6 proxy
+
+promise,async/await,generator
+
+异步转同步
+
+async/await
+
+async
+
+先说一下async的用法，它作为一个关键字放到函数前面，用于表示函数是一个异步函数，因为async就是异步的意思， 异步函数也就意味着该函数的执行不会阻塞后面代码的执行。
+
+返回值是promise
+
+await
+
+只能写在async内
+
+返回resolve参数
+
+await 后面不一定非要跟promise
+
+promise
+
+Promise对象用于异步操作，它表示一个尚未完成且预计在未来完成的异步操作。
+
+promise的三种状态:pennding,fulfilled,rejected
+
+Promise的两个静态方法：Promise.resolve(),Promise.reject()
+
+Promise一旦新建就会「立即执行」，无法取消。这也是它的缺点之一。
+
+同步和异步
+
+/******************同步回调******************/
+var fun1 = function(callback) {
+    //do something
+    console.log("before callback");
+    (callback && typeof(callback) === 'function') && callback();
+    console.log("after callback");
+}
+var fun2 = function(param) {
+    //do something
+    var start = new Date();
+    while((new Date() - start) < 3000) { //delay 3s
+    }
+    console.log("I'm callback");
+}
+fun1(fun2);
+
+-------output--------
+before callback
+//after 3s
+I’m callback
+after callback
+/******************异步回调******************/
+function request(url, param, successFun, errorFun) {
+    $.ajax({
+        type: 'GET',
+        url: url,
+        param: param,
+        async: true,    //默认为true,即异步请求；false为同步请求
+        success: successFun,
+        error: errorFun
+    });
+}
+request('test.html', '', function(data) {
+    //请求成功后的回调函数，通常是对请求回来的数据进行处理
+    console.log('请求成功啦, 这是返回的数据:', data);
+},function(error) {
+    console.log('sorry, 请求失败了, 这是失败信息:', error);
+});
+/******************promise******************/
+function sendRequest(url, param) {
+    return new Promise(function (resolve, reject) {
+        request(url, param, resolve, reject);
+    });
+}
+
+sendRequest('test.html', '').then(function(data) {
+    //异步操作成功后的回调
+    console.log('请求成功啦, 这是返回的数据:', data);
+}, function(error) {
+    //异步操作失败后的回调
+    console.log('sorry, 请求失败了, 这是失败信息:', error);
+});
+Promise的真正强大之处在于它的多重链式调用，可以避免层层嵌套回调。
+
+request('test1.html', '', function(data1) {
+    console.log('第一次请求成功, 这是返回的数据:', data1);
+    request('test2.html', data1, function (data2) {
+        console.log('第二次请求成功, 这是返回的数据:', data2);
+        request('test3.html', data2, function (data3) {
+            console.log('第三次请求成功, 这是返回的数据:', data3);
+            //request... 继续请求
+        }, function(error3) {
+            console.log('第三次请求失败, 这是失败信息:', error3);
+        });
+    }, function(error2) {
+        console.log('第二次请求失败, 这是失败信息:', error2);
+    });
+}, function(error1) {
+    console.log('第一次请求失败, 这是失败信息:', error1);
+});
+//构建Promise
+var promise = new Promise(function (resolve, reject) {
+    if (/* 异步操作成功 */) {
+        resolve(data);
+    } else {
+        /* 异步操作失败 */
+        reject(error);
+    }
+});
+resolve函数的作用：在异步操作成功时调用，并将异步操作的结果，作为参数传递出去；
+reject函数的作用：在异步操作失败时调用，并将异步操作报出的错误，作为参数传递出去。
+.then()
+
+Promise.prototype.then(onFulfilled, onRejected)
+对promise添加onFulfilled和onRejected回调，并返回的是一个新的Promise实例（不是原来那个Promise实例），且返回值将作为参数传入这个新Promise的resolve函数。
+
+.catch()
+
+Promise.prototype.catch(onRejected)
+该方法是.then(undefined, onRejected)的别名，用于指定发生错误时的回调函数。
+
+promise.then(function(data) {
+    console.log('success');
+}).catch(function(error) {
+    console.log('error', error);
+});
+
+/*******等同于*******/
+promise.then(function(data) {
+    console.log('success');
+}).then(undefined, function(error) {
+    console.log('error', error);
+});
+reject方法的作用，等同于抛错。
+
+Promise的两个控制时序的方法：all,race
+
+.all()
+
+Promise.all(iterable)
+该方法用于将多个Promise实例，包装成一个新的Promise实例。
+
+Promise.all方法接受一个数组（或具有Iterator接口）作参数，数组中的对象（p1、p2、p3）均为promise实例（如果不是一个promise，该项会被用Promise.resolve转换为一个promise)。它的状态由这三个promise实例决定。
+
+当p1, p2, p3状态都变为fulfilled，p的状态才会变为fulfilled，并将三个promise返回的结果，按参数的顺序（而不是 resolved的顺序）存入数组，传给p的回调函数，如例3.8。
+当p1, p2, p3其中之一状态变为rejected，p的状态也会变为rejected，并把第一个被reject的promise的返回值，传给p的回调函数，如例3.9。
+/* 例3.8 */
+var p1 = new Promise(function (resolve, reject) {
+    setTimeout(resolve, 3000, "first");
+});
+var p2 = new Promise(function (resolve, reject) {
+    resolve('second');
+});
+var p3 = new Promise((resolve, reject) => {
+  setTimeout(resolve, 1000, "third");
+}); 
+
+Promise.all([p1, p2, p3]).then(function(values) { 
+  console.log(values); 
+});
+
+-------output-------
+//约 3s 后
+["first", "second", "third"]
+/* 例3.9 */
+var p1 = new Promise((resolve, reject) => { 
+  setTimeout(resolve, 1000, "one"); 
+}); 
+var p2 = new Promise((resolve, reject) => { 
+  setTimeout(reject, 2000, "two"); 
+});
+var p3 = new Promise((resolve, reject) => {
+  reject("three");
+});
+
+Promise.all([p1, p2, p3]).then(function (value) {
+    console.log('resolve', value);
+}, function (error) {
+    console.log('reject', error);    // => reject three
+});
+
+-------output-------
+reject three
+.race()
+
+Promise.race(iterable)
+该方法同样是将多个Promise实例，包装成一个新的Promise实例。
+
+Promise.race方法同样接受一个数组（或具有Iterator接口）作参数。当p1, p2, p3中有一个实例的状态发生改变（变为fulfilled或rejected），p的状态就跟着改变。并把第一个改变状态的promise的返回值，传给p的回调函数。
+
+.resolve()
+
+Promise.resolve(value);
+Promise.resolve(promise);
+Promise.resolve(thenable);
+它可以看做new Promise()的快捷方式。
+
+Promise.resolve()的另一个作用就是将thenable对象（即带有then方法的对象）转换为promise对象。
+.reject()
+
+Promise.reject(reason)
+这个方法和上述的Promise.resolve()类似，它也是new Promise()的快捷方式。
+
+Promise 常见问题
+
+1：reject 和 catch 的区别
+
+promise.then(onFulfilled, onRejected)在onFulfilled中发生异常的话，在onRejected中是捕获不到这个异常的。
+promise.then(onFulfilled).catch(onRejected).then中产生的异常能在.catch中捕获
+class
+
+super()//继承父类 在父类的基础上 1函数 2对象
+
+浅拷贝/深拷贝
+
+数组
+
+[...]
+concat() //合并数组返回新数组
+slice() //截取返回新数组
+对象
+
+{...obj}
+Object.assign()

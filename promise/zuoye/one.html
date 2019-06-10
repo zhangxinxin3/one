@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+</body>
+<script>
+    //原生js封装promise
+
+    function myPromise(cb){
+        //初始状态
+        this.status = "pending";
+        this.msg = "";
+
+        cb((data)=>{
+            this.status = "resolve";
+            this.msg = data;
+        },()=>{
+            this.status = "reject";
+        })
+        return this;
+    }
+
+    //链式调用.then
+    myPromise.prototype.then = function(){
+        var cb = arguments;
+
+        //轮询实现异步
+        timer = setInterval(()=>{
+            if(this.status == "resolve"){
+                //成功状态的回调
+                cb[0](this.msg);
+                clearInterval(timer);
+            }else if(this.status == "reject"){
+                //失败状态的回调
+                cb[1](this.msg);
+                clearInterval(timer);
+            }
+        },3000)
+    }
+
+    function loadImg(src){
+        return new myPromise((resolve,reject)=>{
+            let img = new Image();
+            img.src = src;
+            img.onload = function(){
+                console.log(img)
+                resolve(img);
+            }
+            img.onerror = function(e){
+                console.log(e)
+                reject(e);
+            }
+        })
+    }
+    var url = 'img/1.jpg';
+    loadImg(url).then(res=>{
+        console.log(res)
+        document.body.appendChild(res)
+        return res;
+    },err=>{
+        console.log('err...',err)
+    });
+</script>
+</html>
